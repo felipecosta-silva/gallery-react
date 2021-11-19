@@ -29,7 +29,7 @@ export const Container = styled.div`
     cursor: pointer;
     &:hover {
         opacity: .9;
-        transform: scale(1.5);
+        transform: scale(1.1);
         transition: all 0.3s;
     }
   }

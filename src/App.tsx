@@ -27,17 +27,31 @@ const App = () => {
 
     if (file && file.size > 0) {
       setUploading(true);
-      let result = await PhotosService.insert(file);
+      let duplicateImage = await PhotosService.imageDuplicate(file);
+      if (duplicateImage instanceof Error) {
+        alert(`${duplicateImage.message}`);
+      } else {
+        let result = await PhotosService.insert(file);
+        if (result instanceof Error) {
+          alert(`${result.name} - ${result.message}`);
+        } else {
+          let newPhotoList = [...photos];
+          newPhotoList.push(result);
+          setPhotos(newPhotoList);
+        }
+      }
       setUploading(false);
 
-      if (result instanceof Error) {
-        alert(`${result.name} - ${result.message}`);
-      } else {
-        let newPhotoList = [...photos];
-        newPhotoList.push(result);
-        setPhotos(newPhotoList);
-      }
+    } else {
+      alert('Nenhuma imagem foi selecionada');
     }
+    resetForm(e);
+  }
+
+  const resetForm = (e: FormEvent<HTMLFormElement>) => {
+    const resetInput = e.target as unknown as Array<any>;
+    resetInput[0].value = '';
+    console.log(resetInput[0]);
   }
 
   const handleDelete = async (name: string) => {

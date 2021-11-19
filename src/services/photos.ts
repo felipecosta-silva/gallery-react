@@ -1,7 +1,6 @@
 import { Photo } from '../types/Photo';
 import { storage } from '../libs/firebase';
 import { ref, listAll, getDownloadURL, uploadBytes, deleteObject } from 'firebase/storage';
-import { v4 as createdId } from 'uuid';
 
 export const getAll = async () => {
   let list: Photo[] = [];
@@ -22,16 +21,21 @@ export const getAll = async () => {
 
 export const insert = async (file: File) => {
   if (['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
-
-    let randomName = createdId();
-    let newFile = ref(storage, `images/${randomName}`);
-
+    let newFile = ref(storage, `images/${file.name}`);
     let upload = await uploadBytes(newFile, file);
     let photoUrl = await getDownloadURL(upload.ref);
-
     return { name: upload.ref.name, url: photoUrl } as Photo;
   } else {
     return new Error('Tipo de arquivo não permitido.');
+  }
+}
+
+export const imageDuplicate = async (file: File) => {
+  const listAllImage = await getAll();
+  for (let i in listAllImage) {
+    if (listAllImage[i].name === file.name) {
+      return new Error('Imagem duplicada, por favor selecione outra imagem');
+    }
   }
 }
 
